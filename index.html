@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<!-- Sorgt dafür, dass es auf dem Handy wie eine App skaliert -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<title>WM 2026 TV</title>
+<style>
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: #121212;
+    color: #ffffff;
+    margin: 0;
+    padding: 16px;
+  }
+  h2 {
+    margin: 0 0 16px 0;
+    font-size: 20px;
+    color: #e0e0e0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-bottom: 2px solid #333;
+    padding-bottom: 8px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+  td { 
+    padding: 12px 4px; 
+    border-bottom: 1px solid #222; 
+    vertical-align: middle; 
+  }
+  .live { 
+    color: #ff4d4d; 
+    font-weight: bold; 
+    animation: blink 2s infinite; 
+  }
+  .tv { 
+    font-weight: bold; 
+    color: #4db8ff; 
+    text-align: right;
+  }
+  .match { 
+    font-weight: 600; 
+    font-size: 15px; 
+  }
+  .venue { 
+    color: #888; 
+    font-size: 12px; 
+    margin-top: 3px;
+  }
+  .date-time { 
+    white-space: nowrap; 
+    color: #bbb;
+  }
+  
+  @keyframes blink { 50% { opacity: 0.5; } }
+</style>
+</head>
+<body>
+
+<h2>WM 2026 TV-Plan</h2>
+<table id="match-table">
+  <!-- JavaScript füllt diese Tabelle automatisch -->
+</table>
+
+<script>
+// Die Liste der Spiele. Hier kannst du das restliche Turnier nach demselben Muster ergänzen.
+// Zeiten sind im ISO-Format (+02:00 steht für unsere Sommerzeit in Österreich).
+const matches = [
+  { time: "2026-06-16T00:00:00+02:00", match: "Saudi-Arabien – Uruguay", tv: "ServusTV", venue: "Miami" },
+  { time: "2026-06-16T03:00:00+02:00", match: "Iran – Neuseeland", tv: "ServusTV", venue: "Los Angeles" },
+  { time: "2026-06-16T21:00:00+02:00", match: "Frankreich – Senegal", tv: "ORF 1", venue: "New York" },
+  { time: "2026-06-17T00:00:00+02:00", match: "Irak – Norwegen", tv: "ORF 1", venue: "Boston" },
+  { time: "2026-06-17T03:00:00+02:00", match: "Argentinien – Algerien", tv: "ORF 1", venue: "Kansas City" },
+  { time: "2026-06-17T06:00:00+02:00", match: "Österreich – Jordanien", tv: "ORF 1", venue: "San Francisco" },
+  { time: "2026-06-17T19:00:00+02:00", match: "Portugal – DR Kongo", tv: "ServusTV", venue: "Houston" },
+  { time: "2026-06-17T22:00:00+02:00", match: "England – Kroatien", tv: "ServusTV", venue: "Dallas" },
+  { time: "2026-06-18T01:00:00+02:00", match: "Ghana – Panama", tv: "ServusTV", venue: "Toronto" },
+  { time: "2026-06-18T04:00:00+02:00", match: "Usbekistan – Kolumbien", tv: "ServusTV", venue: "Mexiko-Stadt" },
+  { time: "2026-06-18T18:00:00+02:00", match: "Tschechien – Südafrika", tv: "ORF 1", venue: "Atlanta" },
+  { time: "2026-06-18T21:00:00+02:00", match: "Schweiz – Bosnien-Herzegowina", tv: "ORF 1", venue: "Los Angeles" },
+  { time: "2026-06-19T00:00:00+02:00", match: "Kanada – Katar", tv: "ORF 1", venue: "Vancouver" },
+  { time: "2026-06-19T03:00:00+02:00", match: "Mexiko – Südkorea", tv: "ORF 1", venue: "Guadalajara" },
+  { time: "2026-06-19T21:00:00+02:00", match: "USA – Australien", tv: "ServusTV", venue: "TBA" },
+  { time: "2026-06-20T00:00:00+02:00", match: "Schottland – Marokko", tv: "ServusTV", venue: "Boston" },
+  { time: "2026-06-20T02:30:00+02:00", match: "Brasilien – Haiti", tv: "ServusTV", venue: "Philadelphia" },
+  { time: "2026-06-20T05:00:00+02:00", match: "Türkei – Paraguay", tv: "ServusTV", venue: "San Francisco" },
+  { time: "2026-06-20T19:00:00+02:00", match: "Niederlande – Schweden", tv: "ORF 1", venue: "Houston" },
+  { time: "2026-06-20T22:00:00+02:00", match: "Deutschland – Elfenbeinküste", tv: "ORF 1", venue: "Toronto" },
+  { time: "2026-06-21T02:00:00+02:00", match: "Ecuador – Curaçao", tv: "ORF 1", venue: "Kansas City" },
+  { time: "2026-06-21T06:00:00+02:00", match: "Tunesien – Japan", tv: "ORF 1", venue: "Monterrey" },
+  { time: "2026-06-21T18:00:00+02:00", match: "Spanien – Saudi-Arabien", tv: "ServusTV", venue: "Atlanta" },
+  { time: "2026-06-21T21:00:00+02:00", match: "Belgien – Iran", tv: "ServusTV", venue: "Los Angeles" },
+  { time: "2026-06-22T00:00:00+02:00", match: "Uruguay – Kap Verde", tv: "ServusTV", venue: "Miami" },
+  { time: "2026-06-22T03:00:00+02:00", match: "Neuseeland – Ägypten", tv: "ServusTV", venue: "Vancouver" },
+  { time: "2026-06-22T19:00:00+02:00", match: "Argentinien – Österreich", tv: "ServusTV", venue: "Dallas" },
+  { time: "2026-06-22T23:00:00+02:00", match: "Frankreich – Irak", tv: "ORF 1", venue: "Philadelphia" },
+  { time: "2026-06-23T02:00:00+02:00", match: "Norwegen – Senegal", tv: "ORF 1", venue: "New York" },
+  { time: "2026-06-23T05:00:00+02:00", match: "Jordanien – Algerien", tv: "ORF 1", venue: "San Francisco" },
+  { time: "2026-06-23T19:00:00+02:00", match: "Portugal – Usbekistan", tv: "ServusTV", venue: "Houston" },
+  { time: "2026-06-23T22:00:00+02:00", match: "England – Ghana", tv: "ServusTV", venue: "Boston" },
+  { time: "2026-06-24T01:00:00+02:00", match: "Panama – Kroatien", tv: "ServusTV", venue: "Toronto" },
+  { time: "2026-06-24T04:00:00+02:00", match: "Kolumbien – DR Kongo", tv: "ServusTV", venue: "Guadalajara" },
+  { time: "2026-06-24T21:00:00+02:00", match: "Schweiz – Kanada", tv: "ServusTV", venue: "Vancouver" },
+  { time: "2026-06-24T21:00:00+02:00", match: "Bosnien-Herzegowina – Katar", tv: "ServusTV", venue: "Seattle" },
+  { time: "2026-06-25T00:00:00+02:00", match: "Schottland – Brasilien", tv: "ORF 1", venue: "Miami" },
+  { time: "2026-06-25T00:00:00+02:00", match: "Marokko – Haiti", tv: "ORF 1", venue: "Atlanta" },
+  { time: "2026-06-25T03:00:00+02:00", match: "Tschechien – Mexiko", tv: "ORF 1", venue: "Mexiko-Stadt" },
+  { time: "2026-06-25T03:00:00+02:00", match: "Südafrika – Südkorea", tv: "ORF 1", venue: "Monterrey" },
+  { time: "2026-06-25T22:00:00+02:00", match: "Ecuador – Deutschland", tv: "ORF 1", venue: "New York" },
+  { time: "2026-06-25T22:00:00+02:00", match: "Curaçao – Elfenbeinküste", tv: "ORF 1", venue: "Philadelphia" },
+  { time: "2026-06-26T01:00:00+02:00", match: "Tunesien – Niederlande", tv: "ServusTV", venue: "Kansas City" },
+  { time: "2026-06-26T01:00:00+02:00", match: "Japan – Schweden", tv: "ServusTV", venue: "Dallas" },
+  { time: "2026-06-26T04:00:00+02:00", match: "Türkei – USA", tv: "ORF 1", venue: "Los Angeles" },
+  { time: "2026-06-26T04:00:00+02:00", match: "Paraguay – Australien", tv: "ORF 1", venue: "San Francisco" },
+  { time: "2026-06-26T21:00:00+02:00", match: "Norwegen – Frankreich", tv: "ServusTV", venue: "Boston" },
+  { time: "2026-06-26T21:00:00+02:00", match: "Senegal – Irak", tv: "ServusTV", venue: "Toronto" },
+  { time: "2026-06-27T02:00:00+02:00", match: "Uruguay – Spanien", tv: "ORF 1", venue: "Guadalajara" },
+  { time: "2026-06-27T02:00:00+02:00", match: "Kap Verde – Saudi-Arabien", tv: "ORF 1", venue: "Houston" },
+  { time: "2026-06-27T05:00:00+02:00", match: "Neuseeland – Belgien", tv: "ORF 1", venue: "Vancouver" },
+  { time: "2026-06-27T05:00:00+02:00", match: "Ägypten – Iran", tv: "ORF 1", venue: "Seattle" },
+  { time: "2026-06-27T23:00:00+02:00", match: "Panama – England", tv: "ORF 1", venue: "New York" },
+  { time: "2026-06-27T23:00:00+02:00", match: "Kroatien – Ghana", tv: "ORF 1", venue: "Philadelphia" },
+  { time: "2026-06-28T01:30:00+02:00", match: "Kolumbien – Portugal", tv: "ServusTV", venue: "Miami" },
+  { time: "2026-06-28T01:30:00+02:00", match: "DR Kongo – Usbekistan", tv: "ServusTV", venue: "Atlanta" },
+  { time: "2026-06-28T04:00:00+02:00", match: "Jordanien – Argentinien", tv: "ServusTV", venue: "Dallas" },
+  { time: "2026-06-28T04:00:00+02:00", match: "Algerien – Österreich", tv: "ORF 1", venue: "Kansas City" }
+];
+
+function renderMatches() {
+  const now = new Date();
+  // Wir blenden Spiele 110 Minuten (1h 50m) nach Anpfiff aus
+  const matchDurationMs = 110 * 60 * 1000; 
+
+  // 1. Vergangene Spiele herausfiltern
+  const upcoming = matches.filter(m => {
+    const matchTime = new Date(m.time);
+    return (matchTime.getTime() + matchDurationMs) > now.getTime();
+  });
+
+  // 2. Auf exakt 8 Spiele für die perfekte Bildschirmgröße begrenzen
+  const displayMatches = upcoming.slice(0, 8);
+  const tbody = document.createElement("tbody");
+
+  displayMatches.forEach(m => {
+    const matchTime = new Date(m.time);
+    // Ein Spiel gilt als "Live", wenn die Anstoßzeit erreicht, aber die 110 Minuten noch nicht um sind
+    const isLive = matchTime <= now && (matchTime.getTime() + matchDurationMs) > now.getTime();
+    
+    const day = String(matchTime.getDate()).padStart(2, '0');
+    const month = String(matchTime.getMonth() + 1).padStart(2, '0');
+    const hours = String(matchTime.getHours()).padStart(2, '0');
+    const minutes = String(matchTime.getMinutes()).padStart(2, '0');
+    
+    const timeHtml = isLive 
+      ? '<span class="live">🔴 LIVE</span>' 
+      : `${day}.${month}.<br>${hours}:${minutes}`;
+
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td class="date-time">${timeHtml}</td>
+      <td>
+        <div class="match">${m.match}</div>
+        <div class="venue">${m.venue}</div>
+      </td>
+      <td class="tv">${m.tv}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  const table = document.getElementById("match-table");
+  table.innerHTML = "";
+  table.appendChild(tbody);
+}
+
+// Sofort beim Öffnen laden
+renderMatches();
+
+// Alle 60 Sekunden aktualisieren. So verschwinden Spiele automatisch, wenn du die App offen lässt.
+setInterval(renderMatches, 60000);
+</script>
+</body>
+</html>
