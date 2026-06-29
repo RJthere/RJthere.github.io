@@ -3,320 +3,493 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sauerteig Perfektions-Rechner</title>
+    <title>Sauerteig Rechner Pro</title>
     <style>
         :root {
             --bg-color: #121212;
-            --card-bg: #1e1e1e;
-            --text-main: #e0e0e0;
-            --text-muted: #a0a0a0;
-            --accent: #d4a373; /* Warmer Brotfarbton */
-            --accent-hover: #faedcd;
-            --error: #cf6679;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --surface-color: #1e1e1e;
+            --surface-color-light: #2c2c2c;
+            --text-primary: #e0e0e0;
+            --text-secondary: #a0a0a0;
+            --accent-color: #e9bc47;
+            --accent-hover: #d4a330;
+            --border-radius: 12px;
+            --error-color: #cf6679;
         }
 
         body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--bg-color);
-            color: var(--text-main);
+            color: var(--text-primary);
+            margin: 0;
             padding: 20px;
             line-height: 1.6;
         }
 
         .container {
-            max-width: 500px;
+            max-width: 550px;
             margin: 0 auto;
         }
 
-        h1 {
+        h1, h2 {
             text-align: center;
-            color: var(--accent);
-            margin-bottom: 20px;
-            font-size: 1.8rem;
+            color: var(--accent-color);
+            margin-bottom: 24px;
         }
 
         .card {
-            background-color: var(--card-bg);
-            border-radius: 12px;
-            padding: 20px;
+            background-color: var(--surface-color);
+            padding: 24px;
+            border-radius: var(--border-radius);
             margin-bottom: 20px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
         }
 
         label {
             display: block;
             margin-bottom: 8px;
             font-weight: 600;
-            color: var(--text-main);
+            color: var(--text-secondary);
         }
 
         select, input[type="number"] {
             width: 100%;
             padding: 12px;
-            margin-bottom: 20px;
+            background-color: var(--surface-color-light);
             border: 1px solid #333;
             border-radius: 8px;
-            background-color: #2c2c2c;
-            color: #fff;
-            font-size: 1rem;
+            color: var(--text-primary);
+            font-size: 16px;
+            margin-bottom: 16px;
+            box-sizing: border-box;
+            outline: none;
+            transition: border-color 0.2s;
         }
 
         select:focus, input[type="number"]:focus {
-            outline: none;
-            border-color: var(--accent);
+            border-color: var(--accent-color);
         }
-
-        .radio-group {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .radio-option {
+        
+        .input-group {
             display: flex;
             align-items: center;
-            background-color: #2c2c2c;
-            padding: 12px;
-            border-radius: 8px;
-            cursor: pointer;
-            border: 1px solid transparent;
+            margin-bottom: 16px;
         }
-
-        .radio-option:has(input:checked) {
-            border-color: var(--accent);
-            background-color: #382c22;
+        
+        .input-group input {
+            margin-bottom: 0;
+            border-radius: 8px 0 0 8px;
+            border-right: none;
         }
-
-        .radio-option input {
-            margin-right: 10px;
-            accent-color: var(--accent);
-            transform: scale(1.2);
-        }
-
-        button {
-            width: 100%;
-            padding: 15px;
-            background-color: var(--accent);
-            color: #121212;
-            border: none;
-            border-radius: 8px;
-            font-size: 1.1rem;
+        
+        .input-group .unit {
+            background-color: #333;
+            padding: 12px 16px;
+            border: 1px solid #333;
+            border-left: none;
+            border-radius: 0 8px 8px 0;
+            color: var(--text-secondary);
             font-weight: bold;
-            cursor: pointer;
-            transition: background-color 0.2s;
         }
 
-        button:hover {
-            background-color: var(--accent-hover);
-        }
-
-        .hidden {
+        .warning {
+            color: var(--error-color);
+            font-size: 0.85em;
+            margin-top: -10px;
+            margin-bottom: 15px;
             display: none;
         }
 
-        #resultSection {
-            border-left: 4px solid var(--accent);
+        .result-box {
+            background-color: rgba(233, 188, 71, 0.08);
+            border-left: 4px solid var(--accent-color);
+            padding: 16px 20px;
+            margin-top: 10px;
+            border-radius: 0 var(--border-radius) var(--border-radius) 0;
+            display: none;
         }
 
-        .result-title {
-            color: var(--accent);
-            font-size: 1.3rem;
-            margin-bottom: 10px;
+        .result-box h3 {
+            margin-top: 0;
+            color: var(--accent-color);
+            font-size: 1.1em;
+            margin-bottom: 12px;
         }
 
-        .guide-box {
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 1px solid #333;
-            font-size: 0.95rem;
-        }
-
-        .guide-box h3 {
-            color: var(--text-muted);
-            margin-bottom: 10px;
-            font-size: 1rem;
-        }
-
-        .guide-box ul {
-            padding-left: 20px;
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
             margin-bottom: 15px;
         }
 
-        .guide-box li {
-            margin-bottom: 5px;
+        .info-item .label {
+            font-size: 0.8em;
+            color: var(--text-secondary);
+            display: block;
+        }
+
+        .info-item .value {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .calc-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .calc-item {
+            background-color: var(--surface-color-light);
+            padding: 12px 10px;
+            border-radius: 8px;
+            border: 1px solid #333;
+        }
+
+        .calc-value {
+            display: block;
+            font-size: 1.3em;
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+
+        .calc-label {
+            font-size: 0.85em;
+            color: var(--text-secondary);
         }
         
-        .error {
-            color: var(--error);
-            font-weight: bold;
+        .hint {
+            font-size: 0.9em;
+            color: var(--text-secondary);
+            margin-top: 15px;
+            line-height: 1.4;
+        }
+
+        hr {
+            border: 0;
+            height: 1px;
+            background: #333;
+            margin: 24px 0;
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>Sauerteig Rechner</h1>
+    <h1>Sauerteig Architektur</h1>
 
     <div class="card">
-        <label for="type">Welchen Sauerteig nutzt du?</label>
-        <select id="type">
-            <option value="lm">Lievito Madre (fester Weizensauer)</option>
-            <option value="roggen">Roggenvollkornsauerteig (100% Hydratation)</option>
+        <label for="sourdoughType">1. Welchen Sauerteig nutzt du?</label>
+        <select id="sourdoughType">
+            <option value="" disabled selected>Bitte wählen...</option>
+            <option value="lm">Lievito Madre (Weizen, fest)</option>
+            <option value="rvk">Roggenvollkornsauerteig</option>
         </select>
 
-        <label>Was möchtest du berechnen?</label>
-        <div class="radio-group">
-            <label class="radio-option">
-                <input type="radio" name="calcMode" value="time" checked onchange="updateInputs()">
-                Zeit (Dauer bis zur Reife)
-            </label>
-            <label class="radio-option">
-                <input type="radio" name="calcMode" value="temp" onchange="updateInputs()">
-                Temperatur (Umgebung/Teig)
-            </label>
-            <label class="radio-option">
-                <input type="radio" name="calcMode" value="ratio" onchange="updateInputs()">
-                Verhältnis (Mehlmenge)
-            </label>
+        <div id="varSelectionGroup" style="display: none;">
+            <label for="knownVar">2. Was ist deine exakte Vorgabe?</label>
+            <select id="knownVar">
+                <option value="" disabled selected>Bitte wählen...</option>
+                <option value="time">Zeit (Wie lange soll er reifen?)</option>
+                <option value="temp">Temperatur (Wo steht der Teig?)</option>
+                <option value="ratio">Mehlmenge (Fütterungsverhältnis)</option>
+            </select>
         </div>
 
-        <div id="inputGroupRatio" class="input-group">
-            <label for="valRatio">Teile Mehl auf 1 Teil Anstellgut <br><small style="color:var(--text-muted); font-weight:normal;">(z.B. "5" für 1:5:5)</small></label>
-            <input type="number" id="valRatio" placeholder="z.B. 2 oder 5" step="0.5" min="0.5">
+        <div id="valueInputGroup" style="display: none;">
+            <label id="inputLabel" for="exactValue">3. Gib deinen Wert ein:</label>
+            <div class="input-group">
+                <input type="number" id="exactValue" step="0.5">
+                <span id="inputUnit" class="unit"></span>
+            </div>
+            <div id="limitWarning" class="warning">Wert außerhalb des optimalen Bereichs. Wird angepasst.</div>
         </div>
-
-        <div id="inputGroupTemp" class="input-group">
-            <label for="valTemp">Temperatur in °C</label>
-            <input type="number" id="valTemp" placeholder="z.B. 25" step="0.5">
-        </div>
-
-        <div id="inputGroupTime" class="input-group hidden">
-            <label for="valTime">Gewünschte Zeit in Stunden</label>
-            <input type="number" id="valTime" placeholder="z.B. 12" step="0.5">
-        </div>
-
-        <button onclick="calculate()">Berechnen</button>
     </div>
 
-    <div id="resultSection" class="card hidden">
-        <div class="result-title" id="mainResult"></div>
-        
-        <div class="guide-box">
-            <h3>Kurzanleitung & Parameter:</h3>
-            <ul id="guideList">
-                </ul>
+    <div id="parameterResult" class="result-box">
+        <h3>Dein perfektioniertes Profil</h3>
+        <div class="info-grid">
+            <div class="info-item">
+                <span class="label">Reifezeit</span>
+                <span class="value" id="outTime"></span>
+            </div>
+            <div class="info-item">
+                <span class="label">Umgebungstemperatur</span>
+                <span class="value" id="outTemp"></span>
+            </div>
+            <div class="info-item" style="grid-column: span 2;">
+                <span class="label">Verhältnis (ASG : Mehl : Wasser)</span>
+                <span class="value" id="outRatio" style="color: var(--accent-color);"></span>
+            </div>
         </div>
+        <hr style="margin: 12px 0;">
+        <div class="hint">
+            <strong>Mehl (Österreich):</strong> <span id="outFlour"></span><br><br>
+            <strong>Wassertemperatur:</strong> <span id="outWaterTemp"></span>
+        </div>
+    </div>
+
+    <div id="calculatorSection" class="card" style="display: none; margin-top: 20px;">
+        <h2>Zielmenge berechnen</h2>
+        <label for="targetAmount">Wie viel Sauerteig brauchst du insgesamt? (in Gramm)</label>
+        <input type="number" id="targetAmount" placeholder="z.B. 150" min="10">
+
+        <div id="amountsResult" class="calc-grid" style="display: none;">
+            <div class="calc-item">
+                <span class="calc-value" id="calcAsg">0g</span>
+                <span class="calc-label">Anstellgut</span>
+            </div>
+            <div class="calc-item">
+                <span class="calc-value" id="calcFlour">0g</span>
+                <span class="calc-label">Mehl</span>
+            </div>
+            <div class="calc-item">
+                <span class="calc-value" id="calcWater">0g</span>
+                <span class="calc-label">Wasser</span>
+            </div>
+        </div>
+        <p style="text-align: center; font-size: 0.85em; color: var(--text-secondary); margin-top: 15px;">
+            Ergibt exakt: <span id="calcTotal" style="color:#fff; font-weight:bold;">0</span>g
+        </p>
     </div>
 </div>
 
 <script>
-    function updateInputs() {
-        const mode = document.querySelector('input[name="calcMode"]:checked').value;
-        
-        document.getElementById('inputGroupRatio').classList.toggle('hidden', mode === 'ratio');
-        document.getElementById('inputGroupTemp').classList.toggle('hidden', mode === 'temp');
-        document.getElementById('inputGroupTime').classList.toggle('hidden', mode === 'time');
-    }
+    // --- WISSENSCHAFTLICHE BASISDATEN ---
+    // Diese Datenpunkte markieren die sicheren biologischen Grenzen. 
+    // Das System interpoliert (berechnet die Kurve) zwischen diesen Punkten.
+    const doughData = {
+        lm: {
+            flourType: "Weizenmehl Type W700 oder W480 (glatt)",
+            waterFactor: 0.5, // LM hat immer 50% Hydration (Wasser = halbes Mehl)
+            points: [
+                { time: 4, temp: 30, ratio: 1 },  // Warm & Schnell: 1:1:0.5
+                { time: 8, temp: 25, ratio: 2 },  // Medium: 1:2:1
+                { time: 16, temp: 20, ratio: 4 }  // Kühl & Langsam: 1:4:2
+            ]
+        },
+        rvk: {
+            flourType: "Roggenvollkornmehl (oder R960)",
+            waterFactor: 1.0, // RVK hat 100% Hydration (Wasser = Mehl)
+            points: [
+                { time: 4, temp: 30, ratio: 1 },  // Warm & Schnell: 1:1:1
+                { time: 12, temp: 24, ratio: 5 }, // Medium: 1:5:5
+                { time: 24, temp: 20, ratio: 12 } // Kühl & Langsam: 1:12:12
+            ]
+        }
+    };
 
-    function calculate() {
-        const type = document.getElementById('type').value;
-        const mode = document.querySelector('input[name="calcMode"]:checked').value;
-        
-        let R = parseFloat(document.getElementById('valRatio').value);
-        let Temp = parseFloat(document.getElementById('valTemp').value);
-        let Time = parseFloat(document.getElementById('valTime').value);
-        
-        const resultSection = document.getElementById('resultSection');
-        const mainResult = document.getElementById('mainResult');
-        
-        // Mathematische Konstanten für die Näherung
-        // T_base = Referenzzeit bei 1:1 Verhältnis und Referenztemperatur
-        const T_base = 4.0; 
-        const T_ref = type === 'lm' ? 28 : 25; // LM mag es wärmer, Roggen hat sein Optimum bei ~25-28
+    // DOM Elements
+    const typeSelect = document.getElementById('sourdoughType');
+    const varSelectionGroup = document.getElementById('varSelectionGroup');
+    const varSelect = document.getElementById('knownVar');
+    
+    const valueInputGroup = document.getElementById('valueInputGroup');
+    const inputLabel = document.getElementById('inputLabel');
+    const exactValueInput = document.getElementById('exactValue');
+    const inputUnit = document.getElementById('inputUnit');
+    const limitWarning = document.getElementById('limitWarning');
+    
+    const parameterResult = document.getElementById('parameterResult');
+    const calculatorSection = document.getElementById('calculatorSection');
+    const targetAmountInput = document.getElementById('targetAmount');
+    const amountsResult = document.getElementById('amountsResult');
 
-        try {
-            if (mode === 'time') {
-                if (isNaN(R) || isNaN(Temp)) throw "Bitte fülle Verhältnis und Temperatur aus.";
-                if (R < 0.5) throw "Das Verhältnis sollte mindestens 0.5 sein.";
-                
-                // Formel: t = T_base * (1 + 1.2 * ln(R)) * 1.1^(T_ref - Temp)
-                // Q10-Faktor genähert durch Basis 1.1 pro Grad Celsius
-                Time = T_base * (1 + 1.2 * Math.log(R)) * Math.pow(1.1, T_ref - Temp);
-                mainResult.innerHTML = `Erwartete Reifezeit: <strong>${Math.round(Time * 10) / 10} Stunden</strong>`;
-                
-            } else if (mode === 'temp') {
-                if (isNaN(R) || isNaN(Time)) throw "Bitte fülle Verhältnis und Zeit aus.";
-                if (R < 0.5) throw "Das Verhältnis sollte mindestens 0.5 sein.";
-                
-                let baseFactor = T_base * (1 + 1.2 * Math.log(R));
-                if (Time / baseFactor <= 0) throw "Kombination nicht möglich.";
-                
-                Temp = T_ref - (Math.log(Time / baseFactor) / Math.log(1.1));
-                mainResult.innerHTML = `Benötigte Temperatur: <strong>${Math.round(Temp * 10) / 10} °C</strong>`;
-                
-            } else if (mode === 'ratio') {
-                if (isNaN(Temp) || isNaN(Time)) throw "Bitte fülle Temperatur und Zeit aus.";
-                
-                let val = Time / (T_base * Math.pow(1.1, T_ref - Temp));
-                let logR = (val - 1) / 1.2;
-                R = Math.exp(logR);
-                
-                if (R < 0.5) {
-                    R = 0.5;
-                    mainResult.innerHTML = `Empfohlenes Verhältnis: <strong>1 : 0.5</strong> <br><span style="font-size:0.9rem; color:var(--error);">Achtung: Zeit ist sehr kurz oder Temperatur sehr hoch. 1:0.5 ist das Minimum.</span>`;
-                } else {
-                    mainResult.innerHTML = `Empfohlenes Mehl-Verhältnis: <strong>1 : ${Math.round(R * 10) / 10}</strong>`;
-                }
+    // Aktueller State
+    let currentCalc = { time: 0, temp: 0, ratio: 0, waterFactor: 1 };
+
+    // --- LOGIK FÜR INTERPOLATION ---
+    // Berechnet exakte Zwischenwerte auf Basis der biologischen Stützpunkte
+    function interpolate(val, inKey, outKey, pts) {
+        let sorted = [...pts].sort((a, b) => a[inKey] - b[inKey]);
+        
+        // Clamping (Sicherheitsgrenzen)
+        if (val <= sorted[0][inKey]) return sorted[0][outKey];
+        if (val >= sorted[sorted.length-1][inKey]) return sorted[sorted.length-1][outKey];
+        
+        // Interpolation
+        for (let i = 0; i < sorted.length - 1; i++) {
+            if (val >= sorted[i][inKey] && val <= sorted[i+1][inKey]) {
+                let x0 = sorted[i][inKey], y0 = sorted[i][outKey];
+                let x1 = sorted[i+1][inKey], y1 = sorted[i+1][outKey];
+                return y0 + (val - x0) * (y1 - y0) / (x1 - x0);
             }
-
-            generateGuide(type, R, Temp);
-            resultSection.classList.remove('hidden');
-
-        } catch (e) {
-            mainResult.innerHTML = `<span class="error">${e}</span>`;
-            document.getElementById('guideList').innerHTML = "";
-            resultSection.classList.remove('hidden');
         }
     }
 
-    function generateGuide(type, ratio, temp) {
-        const guideList = document.getElementById('guideList');
-        guideList.innerHTML = "";
-        
-        let ratioStr = (Math.round(ratio * 10) / 10).toString().replace('.', ',');
-        let tempStr = Math.round(temp);
-        
-        // Wassertemperatur (Faustregel: Zieltemperatur * 2 - Raum/Mehltemperatur)
-        // Angenommen Raumtemperatur/Mehl = 21°C
-        let waterTemp = (temp * 2) - 21;
-        if (waterTemp < 10) waterTemp = 10; // Untergrenze Leitungswasser
-        if (waterTemp > 45) waterTemp = 45; // Obergrenze vor Hefetod
+    // --- EVENT LISTENERS ---
+    typeSelect.addEventListener('change', () => {
+        varSelectionGroup.style.display = 'block';
+        resetResults();
+        if(varSelect.value) setupInputField(); 
+    });
 
-        if (type === 'lm') {
-            let waterRatio = Math.round((ratio * 0.5) * 10) / 10;
-            addGuideItem(`<strong>Mischverhältnis (ASG : Mehl : Wasser):</strong> 1 : ${ratioStr} : ${waterRatio.toString().replace('.', ',')}`);
-            addGuideItem(`<strong>Österreichische Mehltypen:</strong> Weizenmehl Type W700 oder W480 (glatt). Für besonders starken Trieb idealerweise mit backstarkem Mehl (Manitoba) mischen.`);
-            addGuideItem(`<strong>Wassertemperatur:</strong> ca. ${Math.round(waterTemp)} °C (um eine Teigtemperatur von ${tempStr} °C bei ca. 21°C Raumtemperatur zu erreichen).`);
-            addGuideItem(`<strong>Anleitung:</strong> Zutaten fest verkneten. Zu einer Kugel formen, kreuzweise einschneiden und in ein hohes Gefäß geben. Er ist backbereit, wenn er sich im Volumen verdoppelt bis verdreifacht hat.`);
+    varSelect.addEventListener('change', () => {
+        setupInputField();
+        resetResults();
+    });
+
+    exactValueInput.addEventListener('input', calculateProfile);
+    targetAmountInput.addEventListener('input', calculateAmounts);
+
+    // --- FUNKTIONEN ---
+    function setupInputField() {
+        const knownVar = varSelect.value;
+        const type = typeSelect.value;
+        if (!knownVar || !type) return;
+
+        let pts = doughData[type].points;
+        let min, max, placeholder, label, unit;
+
+        // Min und Max für den jeweiligen Datentyp dynamisch ermitteln
+        let times = pts.map(p => p.time);
+        let temps = pts.map(p => p.temp);
+        let ratios = pts.map(p => p.ratio);
+
+        if (knownVar === 'time') {
+            min = Math.min(...times); max = Math.max(...times);
+            label = "Gewünschte Reifezeit (Stunden):";
+            unit = "h";
+            placeholder = `z.B. ${Math.round((min+max)/2)}`;
+        } else if (knownVar === 'temp') {
+            min = Math.min(...temps); max = Math.max(...temps);
+            label = "Raumtemperatur:";
+            unit = "°C";
+            placeholder = `z.B. 24`;
+        } else if (knownVar === 'ratio') {
+            min = Math.min(...ratios); max = Math.max(...ratios);
+            label = "Mehl-Anteil (z.B. 5 für 1:5:Wasser):";
+            unit = "Teile";
+            placeholder = `z.B. ${Math.round((min+max)/2)}`;
+        }
+
+        inputLabel.textContent = label;
+        inputUnit.textContent = unit;
+        exactValueInput.min = min;
+        exactValueInput.max = max;
+        exactValueInput.placeholder = placeholder;
+        exactValueInput.value = '';
+        
+        valueInputGroup.style.display = 'block';
+    }
+
+    function calculateProfile() {
+        const type = typeSelect.value;
+        const knownVar = varSelect.value;
+        let val = parseFloat(exactValueInput.value);
+
+        if (isNaN(val)) {
+            parameterResult.style.display = 'none';
+            calculatorSection.style.display = 'none';
+            return;
+        }
+
+        let pts = doughData[type].points;
+        const minVal = parseFloat(exactValueInput.min);
+        const maxVal = parseFloat(exactValueInput.max);
+
+        // Warnung bei Überschreiten der sicheren biologischen Grenzen
+        if (val < minVal || val > maxVal) {
+            limitWarning.style.display = 'block';
+            val = Math.max(minVal, Math.min(val, maxVal)); // Wert auf Grenze fixieren
         } else {
-            addGuideItem(`<strong>Mischverhältnis (ASG : Mehl : Wasser):</strong> 1 : ${ratioStr} : ${ratioStr}`);
-            addGuideItem(`<strong>Österreichische Mehltypen:</strong> Roggenvollkornmehl (ideal für kräftige Kulturen) oder Roggenmehl Type R960.`);
-            addGuideItem(`<strong>Wassertemperatur:</strong> ca. ${Math.round(waterTemp)} °C (um eine Zieltemperatur von ${tempStr} °C bei ca. 21°C Raumtemperatur zu erreichen).`);
-            addGuideItem(`<strong>Anleitung:</strong> Gründlich vermischen und Ränder im Glas säubern. Er ist backbereit, wenn er sich deutlich gewölbt hat, von Bläschen durchzogen ist und angenehm säuerlich-fruchtig riecht.`);
+            limitWarning.style.display = 'none';
         }
+
+        // Andere Variablen per Interpolation berechnen
+        if (knownVar === 'time') {
+            currentCalc.time = val;
+            currentCalc.temp = interpolate(val, 'time', 'temp', pts);
+            currentCalc.ratio = interpolate(val, 'time', 'ratio', pts);
+        } else if (knownVar === 'temp') {
+            currentCalc.temp = val;
+            currentCalc.time = interpolate(val, 'temp', 'time', pts);
+            currentCalc.ratio = interpolate(val, 'temp', 'ratio', pts);
+        } else if (knownVar === 'ratio') {
+            currentCalc.ratio = val;
+            currentCalc.time = interpolate(val, 'ratio', 'time', pts);
+            currentCalc.temp = interpolate(val, 'ratio', 'temp', pts);
+        }
+
+        currentCalc.waterFactor = doughData[type].waterFactor;
+        
+        renderProfileInfo();
     }
 
-    function addGuideItem(htmlContent) {
-        const li = document.createElement('li');
-        li.innerHTML = htmlContent;
-        document.getElementById('guideList').appendChild(li);
+    function renderProfileInfo() {
+        const type = typeSelect.value;
+        
+        // Werte runden für die Anzeige
+        let r = currentCalc.ratio.toFixed(1).replace('.0', '');
+        let w = (currentCalc.ratio * currentCalc.waterFactor).toFixed(1).replace('.0', '');
+        let t = currentCalc.time.toFixed(1).replace('.0', '');
+        let temp = currentCalc.temp.toFixed(1).replace('.0', '');
+
+        document.getElementById('outRatio').textContent = `1 : ${r} : ${w}`;
+        document.getElementById('outTime').textContent = `${t} Stunden`;
+        document.getElementById('outTemp').textContent = `${temp} °C`;
+        
+        document.getElementById('outFlour').textContent = doughData[type].flourType;
+        
+        // Wassertemperatur-Logik
+        let waterHint = "";
+        if (currentCalc.temp < 22) {
+            waterHint = "Nimm gut warmes Wasser (ca. 30-35°C), um dem Teig in der kühlen Umgebung Starthilfe zu geben.";
+        } else if (currentCalc.temp > 26) {
+            waterHint = "Nimm eher kühleres Raumtemperatur-Wasser (ca. 20-22°C), damit die Hefe nicht überhitzt.";
+        } else {
+            waterHint = "Handwarmes Wasser (ca. 25-28°C) ist hier optimal.";
+        }
+        document.getElementById('outWaterTemp').textContent = waterHint;
+
+        parameterResult.style.display = 'block';
+        calculatorSection.style.display = 'block';
+        
+        if(targetAmountInput.value) calculateAmounts();
+    }
+
+    function calculateAmounts() {
+        const target = parseFloat(targetAmountInput.value);
+        
+        if (isNaN(target) || target <= 0) {
+            amountsResult.style.display = 'none';
+            return;
+        }
+
+        // Exakte Mengenberechnung (inklusive berechneter Kommastellen aus der Interpolation)
+        const partsAsg = 1;
+        const partsFlour = currentCalc.ratio;
+        const partsWater = currentCalc.ratio * currentCalc.waterFactor;
+        
+        const totalParts = partsAsg + partsFlour + partsWater;
+        const multiplier = target / totalParts;
+
+        // Kaufmännisch runden
+        const asg = Math.round(partsAsg * multiplier);
+        const flour = Math.round(partsFlour * multiplier);
+        
+        // Wasser als Differenz zur Zielmenge berechnen (vermeidet Rundungsfehler in der Summe!)
+        const water = target - asg - flour;
+
+        document.getElementById('calcAsg').textContent = `${asg}g`;
+        document.getElementById('calcFlour').textContent = `${flour}g`;
+        document.getElementById('calcWater').textContent = `${water}g`;
+        document.getElementById('calcTotal').textContent = target;
+
+        amountsResult.style.display = 'grid';
+    }
+
+    function resetResults() {
+        parameterResult.style.display = 'none';
+        calculatorSection.style.display = 'none';
+        amountsResult.style.display = 'none';
+        targetAmountInput.value = '';
+        exactValueInput.value = '';
+        limitWarning.style.display = 'none';
     }
 </script>
 
