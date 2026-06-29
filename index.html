@@ -1,187 +1,283 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-<meta charset="UTF-8">
-<!-- Sorgt dafür, dass es auf dem Handy wie eine App skaliert -->
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="mobile-web-app-capable" content="yes">
-<title>WM 2026 TV</title>
-<style>
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    background-color: #121212;
-    color: #ffffff;
-    margin: 0;
-    padding: 16px;
-  }
-  h2 {
-    margin: 0 0 16px 0;
-    font-size: 20px;
-    color: #e0e0e0;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    border-bottom: 2px solid #333;
-    padding-bottom: 8px;
-  }
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 14px;
-  }
-  td { 
-    padding: 12px 4px; 
-    border-bottom: 1px solid #222; 
-    vertical-align: middle; 
-  }
-  .live { 
-    color: #ff4d4d; 
-    font-weight: bold; 
-    animation: blink 2s infinite; 
-  }
-  .tv { 
-    font-weight: bold; 
-    color: #4db8ff; 
-    text-align: right;
-  }
-  .match { 
-    font-weight: 600; 
-    font-size: 15px; 
-  }
-  .venue { 
-    color: #888; 
-    font-size: 12px; 
-    margin-top: 3px;
-  }
-  .date-time { 
-    white-space: nowrap; 
-    color: #bbb;
-  }
-  
-  @keyframes blink { 50% { opacity: 0.5; } }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sauerteig & Lievito Madre Rechner</title>
+    <style>
+        :root {
+            --bg-color: #f9f6f0;
+            --text-color: #333;
+            --accent-color: #c07a3c;
+            --card-bg: #ffffff;
+            --border-radius: 12px;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 1.5rem;
+            color: var(--accent-color);
+            margin-top: 0;
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            box-sizing: border-box;
+            background-color: #fafafa;
+            transition: border-color 0.2s;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .radio-group input[type="radio"] {
+            display: none;
+        }
+
+        .radio-group label {
+            flex: 1;
+            text-align: center;
+            padding: 12px;
+            background: #eee;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 0;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+
+        .radio-group input[type="radio"]:checked + label {
+            background: #fdf5ef;
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background-color: var(--accent-color);
+            color: white;
+            font-weight: 600;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .results-section {
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 2px dashed #eee;
+        }
+
+        .note {
+            font-size: 0.85rem;
+            color: #666;
+            margin-top: 20px;
+            line-height: 1.4;
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 8px;
+        }
+    </style>
 </head>
 <body>
 
-<h2>WM 2026 TV-Plan</h2>
-<table id="match-table">
-  <!-- JavaScript füllt diese Tabelle automatisch -->
-</table>
+<div class="container">
+    <h1>Sauerteig-Rechner</h1>
+
+    <label>Welchen Sauerteig nutzt du?</label>
+    <div class="radio-group">
+        <input type="radio" id="lm" name="type" value="lm" checked onchange="calculate()">
+        <label for="lm">Lievito Madre</label>
+        
+        <input type="radio" id="rvst" name="type" value="rvst" onchange="calculate()">
+        <label for="rvst">Roggenvollkorn</label>
+    </div>
+
+    <label for="inputMode">Was möchtest du vorgeben?</label>
+    <select id="inputMode" onchange="updateInputField(); calculate()">
+        <option value="time">Gewünschte Zeit bis zur Reife (Stunden)</option>
+        <option value="temp">Meine Raumtemperatur (°C)</option>
+        <option value="ratio">Fütterungsverhältnis (1 : X)</option>
+    </select>
+
+    <label id="inputLabel" for="valInput">Zeit in Stunden:</label>
+    <input type="number" id="valInput" value="12" step="0.5" min="1" oninput="calculate()">
+
+    <div class="results-section" id="resultsSection" style="display:none;">
+        <h3 id="resultTitle" style="margin-top: 0; font-size: 1.1rem;">Passende Kombinationen:</h3>
+        <div id="resultsTableContainer"></div>
+    </div>
+
+    <div class="note">
+        <strong>Kurzanleitung:</strong><br>
+        <strong>LM:</strong> Wird fest geführt. Verhältnis 1:X bedeutet z.B. bei 1:2 -> 10g LM + 20g Mehl + 10g Wasser. Reif, wenn Volumen verdoppelt und Geruch mild/fruchtig.<br><br>
+        <strong>Roggen:</strong> Wird weich geführt. 1:X bedeutet z.B. bei 1:2 -> 10g ASG + 20g Mehl + 20g Wasser. Reif, wenn voller Bläschen und Geruch angenehm säuerlich.
+    </div>
+</div>
 
 <script>
-// Die Liste der Spiele. Hier kannst du das restliche Turnier nach demselben Muster ergänzen.
-// Zeiten sind im ISO-Format (+02:00 steht für unsere Sommerzeit in Österreich).
-const matches = [
-  { time: "2026-06-16T00:00:00+02:00", match: "Saudi-Arabien – Uruguay", tv: "ServusTV", venue: "Miami" },
-  { time: "2026-06-16T03:00:00+02:00", match: "Iran – Neuseeland", tv: "ServusTV", venue: "Los Angeles" },
-  { time: "2026-06-16T21:00:00+02:00", match: "Frankreich – Senegal", tv: "ORF 1", venue: "New York" },
-  { time: "2026-06-17T00:00:00+02:00", match: "Irak – Norwegen", tv: "ORF 1", venue: "Boston" },
-  { time: "2026-06-17T03:00:00+02:00", match: "Argentinien – Algerien", tv: "ORF 1", venue: "Kansas City" },
-  { time: "2026-06-17T06:00:00+02:00", match: "Österreich – Jordanien", tv: "ORF 1", venue: "San Francisco" },
-  { time: "2026-06-17T19:00:00+02:00", match: "Portugal – DR Kongo", tv: "ServusTV", venue: "Houston" },
-  { time: "2026-06-17T22:00:00+02:00", match: "England – Kroatien", tv: "ServusTV", venue: "Dallas" },
-  { time: "2026-06-18T01:00:00+02:00", match: "Ghana – Panama", tv: "ServusTV", venue: "Toronto" },
-  { time: "2026-06-18T04:00:00+02:00", match: "Usbekistan – Kolumbien", tv: "ServusTV", venue: "Mexiko-Stadt" },
-  { time: "2026-06-18T18:00:00+02:00", match: "Tschechien – Südafrika", tv: "ORF 1", venue: "Atlanta" },
-  { time: "2026-06-18T21:00:00+02:00", match: "Schweiz – Bosnien-Herzegowina", tv: "ORF 1", venue: "Los Angeles" },
-  { time: "2026-06-19T00:00:00+02:00", match: "Kanada – Katar", tv: "ORF 1", venue: "Vancouver" },
-  { time: "2026-06-19T03:00:00+02:00", match: "Mexiko – Südkorea", tv: "ORF 1", venue: "Guadalajara" },
-  { time: "2026-06-19T21:00:00+02:00", match: "USA – Australien", tv: "ServusTV", venue: "TBA" },
-  { time: "2026-06-20T00:00:00+02:00", match: "Schottland – Marokko", tv: "ServusTV", venue: "Boston" },
-  { time: "2026-06-20T02:30:00+02:00", match: "Brasilien – Haiti", tv: "ServusTV", venue: "Philadelphia" },
-  { time: "2026-06-20T05:00:00+02:00", match: "Türkei – Paraguay", tv: "ServusTV", venue: "San Francisco" },
-  { time: "2026-06-20T19:00:00+02:00", match: "Niederlande – Schweden", tv: "ORF 1", venue: "Houston" },
-  { time: "2026-06-20T22:00:00+02:00", match: "Deutschland – Elfenbeinküste", tv: "ORF 1", venue: "Toronto" },
-  { time: "2026-06-21T02:00:00+02:00", match: "Ecuador – Curaçao", tv: "ORF 1", venue: "Kansas City" },
-  { time: "2026-06-21T06:00:00+02:00", match: "Tunesien – Japan", tv: "ORF 1", venue: "Monterrey" },
-  { time: "2026-06-21T18:00:00+02:00", match: "Spanien – Saudi-Arabien", tv: "ServusTV", venue: "Atlanta" },
-  { time: "2026-06-21T21:00:00+02:00", match: "Belgien – Iran", tv: "ServusTV", venue: "Los Angeles" },
-  { time: "2026-06-22T00:00:00+02:00", match: "Uruguay – Kap Verde", tv: "ServusTV", venue: "Miami" },
-  { time: "2026-06-22T03:00:00+02:00", match: "Neuseeland – Ägypten", tv: "ServusTV", venue: "Vancouver" },
-  { time: "2026-06-22T19:00:00+02:00", match: "Argentinien – Österreich", tv: "ServusTV", venue: "Dallas" },
-  { time: "2026-06-22T23:00:00+02:00", match: "Frankreich – Irak", tv: "ORF 1", venue: "Philadelphia" },
-  { time: "2026-06-23T02:00:00+02:00", match: "Norwegen – Senegal", tv: "ORF 1", venue: "New York" },
-  { time: "2026-06-23T05:00:00+02:00", match: "Jordanien – Algerien", tv: "ORF 1", venue: "San Francisco" },
-  { time: "2026-06-23T19:00:00+02:00", match: "Portugal – Usbekistan", tv: "ServusTV", venue: "Houston" },
-  { time: "2026-06-23T22:00:00+02:00", match: "England – Ghana", tv: "ServusTV", venue: "Boston" },
-  { time: "2026-06-24T01:00:00+02:00", match: "Panama – Kroatien", tv: "ServusTV", venue: "Toronto" },
-  { time: "2026-06-24T04:00:00+02:00", match: "Kolumbien – DR Kongo", tv: "ServusTV", venue: "Guadalajara" },
-  { time: "2026-06-24T21:00:00+02:00", match: "Schweiz – Kanada", tv: "ServusTV", venue: "Vancouver" },
-  { time: "2026-06-24T21:00:00+02:00", match: "Bosnien-Herzegowina – Katar", tv: "ServusTV", venue: "Seattle" },
-  { time: "2026-06-25T00:00:00+02:00", match: "Schottland – Brasilien", tv: "ORF 1", venue: "Miami" },
-  { time: "2026-06-25T00:00:00+02:00", match: "Marokko – Haiti", tv: "ORF 1", venue: "Atlanta" },
-  { time: "2026-06-25T03:00:00+02:00", match: "Tschechien – Mexiko", tv: "ORF 1", venue: "Mexiko-Stadt" },
-  { time: "2026-06-25T03:00:00+02:00", match: "Südafrika – Südkorea", tv: "ORF 1", venue: "Monterrey" },
-  { time: "2026-06-25T22:00:00+02:00", match: "Ecuador – Deutschland", tv: "ORF 1", venue: "New York" },
-  { time: "2026-06-25T22:00:00+02:00", match: "Curaçao – Elfenbeinküste", tv: "ORF 1", venue: "Philadelphia" },
-  { time: "2026-06-26T01:00:00+02:00", match: "Tunesien – Niederlande", tv: "ServusTV", venue: "Kansas City" },
-  { time: "2026-06-26T01:00:00+02:00", match: "Japan – Schweden", tv: "ServusTV", venue: "Dallas" },
-  { time: "2026-06-26T04:00:00+02:00", match: "Türkei – USA", tv: "ORF 1", venue: "Los Angeles" },
-  { time: "2026-06-26T04:00:00+02:00", match: "Paraguay – Australien", tv: "ORF 1", venue: "San Francisco" },
-  { time: "2026-06-26T21:00:00+02:00", match: "Norwegen – Frankreich", tv: "ServusTV", venue: "Boston" },
-  { time: "2026-06-26T21:00:00+02:00", match: "Senegal – Irak", tv: "ServusTV", venue: "Toronto" },
-  { time: "2026-06-27T02:00:00+02:00", match: "Uruguay – Spanien", tv: "ORF 1", venue: "Guadalajara" },
-  { time: "2026-06-27T02:00:00+02:00", match: "Kap Verde – Saudi-Arabien", tv: "ORF 1", venue: "Houston" },
-  { time: "2026-06-27T05:00:00+02:00", match: "Neuseeland – Belgien", tv: "ORF 1", venue: "Vancouver" },
-  { time: "2026-06-27T05:00:00+02:00", match: "Ägypten – Iran", tv: "ORF 1", venue: "Seattle" },
-  { time: "2026-06-27T23:00:00+02:00", match: "Panama – England", tv: "ORF 1", venue: "New York" },
-  { time: "2026-06-27T23:00:00+02:00", match: "Kroatien – Ghana", tv: "ORF 1", venue: "Philadelphia" },
-  { time: "2026-06-28T01:30:00+02:00", match: "Kolumbien – Portugal", tv: "ServusTV", venue: "Miami" },
-  { time: "2026-06-28T01:30:00+02:00", match: "DR Kongo – Usbekistan", tv: "ServusTV", venue: "Atlanta" },
-  { time: "2026-06-28T04:00:00+02:00", match: "Jordanien – Argentinien", tv: "ServusTV", venue: "Dallas" },
-  { time: "2026-06-28T04:00:00+02:00", match: "Algerien – Österreich", tv: "ORF 1", venue: "Kansas City" }
-];
-
-function renderMatches() {
-  const now = new Date();
-  // Wir blenden Spiele 110 Minuten (1h 50m) nach Anpfiff aus
-  const matchDurationMs = 110 * 60 * 1000; 
-
-  // 1. Vergangene Spiele herausfiltern
-  const upcoming = matches.filter(m => {
-    const matchTime = new Date(m.time);
-    return (matchTime.getTime() + matchDurationMs) > now.getTime();
-  });
-
-  // 2. Auf exakt 8 Spiele für die perfekte Bildschirmgröße begrenzen
-  const displayMatches = upcoming.slice(0, 8);
-  const tbody = document.createElement("tbody");
-
-  displayMatches.forEach(m => {
-    const matchTime = new Date(m.time);
-    // Ein Spiel gilt als "Live", wenn die Anstoßzeit erreicht, aber die 110 Minuten noch nicht um sind
-    const isLive = matchTime <= now && (matchTime.getTime() + matchDurationMs) > now.getTime();
+    // Empirical base formulas for sourdough at 28°C
+    // Time multiplier: +12% time for every 1°C below 28°C
     
-    const day = String(matchTime.getDate()).padStart(2, '0');
-    const month = String(matchTime.getMonth() + 1).padStart(2, '0');
-    const hours = String(matchTime.getHours()).padStart(2, '0');
-    const minutes = String(matchTime.getMinutes()).padStart(2, '0');
-    
-    const timeHtml = isLive 
-      ? '<span class="live">🔴 LIVE</span>' 
-      : `${day}.${month}.<br>${hours}:${minutes}`;
+    function getBaseTime(type, ratio) {
+        if (ratio < 1) return null;
+        if (type === 'lm') {
+            return 4 + Math.log2(ratio) * 2; // LM: 1:1 = 4h, 1:2 = 6h at 28C
+        } else {
+            return 3 + Math.log2(ratio) * 2.5; // RVST: 1:1 = 3h, 1:2 = 5.5h at 28C
+        }
+    }
 
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td class="date-time">${timeHtml}</td>
-      <td>
-        <div class="match">${m.match}</div>
-        <div class="venue">${m.venue}</div>
-      </td>
-      <td class="tv">${m.tv}</td>
-    `;
-    tbody.appendChild(tr);
-  });
+    function getTempMultiplier(temp) {
+        return Math.pow(1.12, 28 - temp);
+    }
 
-  const table = document.getElementById("match-table");
-  table.innerHTML = "";
-  table.appendChild(tbody);
-}
+    function calcTime(type, ratio, temp) {
+        return getBaseTime(type, ratio) * getTempMultiplier(temp);
+    }
 
-// Sofort beim Öffnen laden
-renderMatches();
+    function calcRatio(type, time, temp) {
+        let targetBaseTime = time / getTempMultiplier(temp);
+        let ratio;
+        if (type === 'lm') {
+            // target = 4 + log2(ratio) * 2  --> (target - 4)/2 = log2(ratio)
+            ratio = Math.pow(2, (targetBaseTime - 4) / 2);
+        } else {
+            // target = 3 + log2(ratio) * 2.5 --> (target - 3)/2.5 = log2(ratio)
+            ratio = Math.pow(2, (targetBaseTime - 3) / 2.5);
+        }
+        return Math.max(1, ratio); // Ratio cannot be less than 1:1 for practical purposes
+    }
 
-// Alle 60 Sekunden aktualisieren. So verschwinden Spiele automatisch, wenn du die App offen lässt.
-setInterval(renderMatches, 60000);
+    function formatTime(decimalHours) {
+        let hrs = Math.floor(decimalHours);
+        let mins = Math.round((decimalHours - hrs) * 60);
+        if (mins === 60) { hrs++; mins = 0; }
+        return `${hrs} Std ${mins > 0 ? mins + ' Min' : ''}`;
+    }
+
+    function updateInputField() {
+        const mode = document.getElementById('inputMode').value;
+        const label = document.getElementById('inputLabel');
+        const input = document.getElementById('valInput');
+
+        if (mode === 'time') {
+            label.innerText = 'Gewünschte Zeit (Stunden):';
+            input.value = 12;
+            input.step = 0.5;
+        } else if (mode === 'temp') {
+            label.innerText = 'Raum-/Gärtemperatur (°C):';
+            input.value = 22;
+            input.step = 1;
+        } else if (mode === 'ratio') {
+            label.innerText = 'Mehl-Verhältnis (1 : X) - Gib X ein:';
+            input.value = 3;
+            input.step = 0.5;
+        }
+    }
+
+    function calculate() {
+        const type = document.querySelector('input[name="type"]:checked').value;
+        const mode = document.getElementById('inputMode').value;
+        const val = parseFloat(document.getElementById('valInput').value);
+        
+        if (isNaN(val) || val <= 0) return;
+
+        const resultsSection = document.getElementById('resultsSection');
+        const tableContainer = document.getElementById('resultsTableContainer');
+        
+        let html = '<table>';
+
+        if (mode === 'time') {
+            html += '<tr><th>Temperatur</th><th>Benötigtes Verhältnis</th></tr>';
+            const temps = [20, 22, 24, 26, 28];
+            temps.forEach(t => {
+                let r = calcRatio(type, val, t);
+                html += `<tr><td>${t} °C</td><td>1 : ${r.toFixed(1)}</td></tr>`;
+            });
+            html += '</table>';
+            
+        } else if (mode === 'temp') {
+            html += '<tr><th>Verhältnis (ASG:Mehl)</th><th>Geschätzte Dauer</th></tr>';
+            const ratios = [1, 2, 3, 5, 10];
+            ratios.forEach(r => {
+                let time = calcTime(type, r, val);
+                html += `<tr><td>1 : ${r}</td><td>${formatTime(time)}</td></tr>`;
+            });
+            html += '</table>';
+            
+        } else if (mode === 'ratio') {
+            html += '<tr><th>Temperatur</th><th>Geschätzte Dauer</th></tr>';
+            const temps = [20, 22, 24, 26, 28];
+            temps.forEach(t => {
+                let time = calcTime(type, val, t);
+                html += `<tr><td>${t} °C</td><td>${formatTime(time)}</td></tr>`;
+            });
+            html += '</table>';
+        }
+
+        tableContainer.innerHTML = html;
+        resultsSection.style.display = 'block';
+    }
+
+    // Initialize
+    calculate();
 </script>
+
 </body>
 </html>
