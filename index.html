@@ -70,10 +70,16 @@
             border-color: var(--accent-color);
         }
         
+        .input-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
         .input-group {
+            flex: 1;
             display: flex;
             align-items: center;
-            margin-bottom: 16px;
         }
         
         .input-group input {
@@ -84,20 +90,12 @@
         
         .input-group .unit {
             background-color: #333;
-            padding: 12px 16px;
+            padding: 12px;
             border: 1px solid #333;
             border-left: none;
             border-radius: 0 8px 8px 0;
             color: var(--text-secondary);
             font-weight: bold;
-        }
-
-        .warning {
-            color: var(--error-color);
-            font-size: 0.85em;
-            margin-top: -10px;
-            margin-bottom: 15px;
-            display: none;
         }
 
         .result-box {
@@ -118,8 +116,7 @@
 
         .info-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
+            gap: 12px;
             margin-bottom: 15px;
         }
 
@@ -130,9 +127,9 @@
         }
 
         .info-item .value {
-            font-size: 1.1em;
+            font-size: 1.4em;
             font-weight: bold;
-            color: #fff;
+            color: var(--accent-color);
         }
 
         .calc-grid {
@@ -173,7 +170,7 @@
             border: 0;
             height: 1px;
             background: #333;
-            margin: 24px 0;
+            margin: 16px 0;
         }
     </style>
 </head>
@@ -190,52 +187,46 @@
             <option value="rvk">Roggenvollkornsauerteig</option>
         </select>
 
-        <div id="varSelectionGroup" style="display: none;">
-            <label for="knownVar">2. Was ist deine exakte Vorgabe?</label>
-            <select id="knownVar">
-                <option value="" disabled selected>Bitte wählen...</option>
-                <option value="time">Zeit (Wie lange soll er reifen?)</option>
-                <option value="temp">Temperatur (Wo steht der Teig?)</option>
-                <option value="ratio">Mehlmenge (Fütterungsverhältnis)</option>
-            </select>
-        </div>
-
-        <div id="valueInputGroup" style="display: none;">
-            <label id="inputLabel" for="exactValue">3. Gib deinen Wert ein:</label>
-            <div class="input-group">
-                <input type="number" id="exactValue" step="0.5">
-                <span id="inputUnit" class="unit"></span>
+        <div id="dynamicInputs" style="display: none; margin-top: 20px;">
+            <label>2. Wie sind deine Umgebungsfaktoren?</label>
+            <div class="input-row">
+                <div style="flex: 1;">
+                    <span style="font-size: 0.8em; color: var(--text-secondary);">Reifezeit</span>
+                    <div class="input-group">
+                        <input type="number" id="inputTime" step="0.5" min="3" max="48" placeholder="z.B. 12">
+                        <span class="unit">h</span>
+                    </div>
+                </div>
+                <div style="flex: 1;">
+                    <span style="font-size: 0.8em; color: var(--text-secondary);">Temperatur</span>
+                    <div class="input-group">
+                        <input type="number" id="inputTemp" step="0.5" min="15" max="35" placeholder="z.B. 24">
+                        <span class="unit">°C</span>
+                    </div>
+                </div>
             </div>
-            <div id="limitWarning" class="warning">Wert außerhalb des optimalen Bereichs. Wird angepasst.</div>
         </div>
     </div>
 
     <div id="parameterResult" class="result-box">
-        <h3>Dein perfektioniertes Profil</h3>
+        <h3>Dein optimales Fütterungsverhältnis</h3>
         <div class="info-grid">
             <div class="info-item">
-                <span class="label">Reifezeit</span>
-                <span class="value" id="outTime"></span>
-            </div>
-            <div class="info-item">
-                <span class="label">Umgebungstemperatur</span>
-                <span class="value" id="outTemp"></span>
-            </div>
-            <div class="info-item" style="grid-column: span 2;">
-                <span class="label">Verhältnis (ASG : Mehl : Wasser)</span>
-                <span class="value" id="outRatio" style="color: var(--accent-color);"></span>
+                <span class="label">So musst du füttern (Anstellgut : Mehl : Wasser)</span>
+                <span class="value" id="outRatio"></span>
             </div>
         </div>
-        <hr style="margin: 12px 0;">
+        <hr>
         <div class="hint">
             <strong>Mehl (Österreich):</strong> <span id="outFlour"></span><br><br>
-            <strong>Wassertemperatur:</strong> <span id="outWaterTemp"></span>
+            <strong>Wassertemperatur:</strong> <span id="outWaterTemp"></span><br><br>
+            <strong>Anleitung:</strong> ASG zuerst im Wasser auflösen, dann mit dem Mehl gut verkneten. Glattstreichen und abgedeckt reifen lassen, bis er sich etwa verdoppelt (RVK) bzw. verdreifacht (LM) hat.
         </div>
     </div>
 
     <div id="calculatorSection" class="card" style="display: none; margin-top: 20px;">
         <h2>Zielmenge berechnen</h2>
-        <label for="targetAmount">Wie viel Sauerteig brauchst du insgesamt? (in Gramm)</label>
+        <label for="targetAmount">Wie viel Sauerteig brauchst du für dein Rezept? (in Gramm)</label>
         <input type="number" id="targetAmount" placeholder="z.B. 150" min="10">
 
         <div id="amountsResult" class="calc-grid" style="display: none;">
@@ -259,44 +250,131 @@
 </div>
 
 <script>
-    // --- WISSENSCHAFTLICHE BASISDATEN ---
-    // Diese Datenpunkte markieren die sicheren biologischen Grenzen. 
-    // Das System interpoliert (berechnet die Kurve) zwischen diesen Punkten.
-    const doughData = {
-        lm: {
-            flourType: "Weizenmehl Type W700 oder W480 (glatt)",
-            waterFactor: 0.5, // LM hat immer 50% Hydration (Wasser = halbes Mehl)
-            points: [
-                { time: 4, temp: 30, ratio: 1 },  // Warm & Schnell: 1:1:0.5
-                { time: 8, temp: 25, ratio: 2 },  // Medium: 1:2:1
-                { time: 16, temp: 20, ratio: 4 }  // Kühl & Langsam: 1:4:2
-            ]
-        },
-        rvk: {
-            flourType: "Roggenvollkornmehl (oder R960)",
-            waterFactor: 1.0, // RVK hat 100% Hydration (Wasser = Mehl)
-            points: [
-                { time: 4, temp: 30, ratio: 1 },  // Warm & Schnell: 1:1:1
-                { time: 12, temp: 24, ratio: 5 }, // Medium: 1:5:5
-                { time: 24, temp: 20, ratio: 12 } // Kühl & Langsam: 1:12:12
-            ]
-        }
-    };
-
     // DOM Elements
     const typeSelect = document.getElementById('sourdoughType');
-    const varSelectionGroup = document.getElementById('varSelectionGroup');
-    const varSelect = document.getElementById('knownVar');
-    
-    const valueInputGroup = document.getElementById('valueInputGroup');
-    const inputLabel = document.getElementById('inputLabel');
-    const exactValueInput = document.getElementById('exactValue');
-    const inputUnit = document.getElementById('inputUnit');
-    const limitWarning = document.getElementById('limitWarning');
+    const dynamicInputs = document.getElementById('dynamicInputs');
+    const inputTime = document.getElementById('inputTime');
+    const inputTemp = document.getElementById('inputTemp');
     
     const parameterResult = document.getElementById('parameterResult');
     const calculatorSection = document.getElementById('calculatorSection');
     const targetAmountInput = document.getElementById('targetAmount');
+    const amountsResult = document.getElementById('amountsResult');
+
+    // State
+    let currentCalc = { ratioFlour: 0, waterFactor: 1 };
+
+    // Event Listeners
+    typeSelect.addEventListener('change', () => {
+        dynamicInputs.style.display = 'block';
+        calculateProfile();
+    });
+
+    inputTime.addEventListener('input', calculateProfile);
+    inputTemp.addEventListener('input', calculateProfile);
+    targetAmountInput.addEventListener('input', calculateAmounts);
+
+    function calculateProfile() {
+        const type = typeSelect.value;
+        let t = parseFloat(inputTime.value);
+        let T = parseFloat(inputTemp.value);
+
+        // Prüfen, ob beide Felder ausgefüllt sind
+        if (!type || isNaN(t) || isNaN(T)) {
+            parameterResult.style.display = 'none';
+            calculatorSection.style.display = 'none';
+            return;
+        }
+
+        // Sicherstellen, dass Werte in halbwegs biologischen Grenzen bleiben (Clamping)
+        if (T < 15) T = 15; if (T > 35) T = 35;
+        if (t < 3) t = 3; if (t > 48) t = 48;
+
+        let ratioFlour = 0;
+
+        // Wissenschaftliche Approximation der Reifung (Triebkraft vs. Temperatur & Zeit)
+        if (type === 'lm') {
+            // Lievito Madre: Feste Hydration (Wasser = 50% vom Mehl)
+            currentCalc.waterFactor = 0.5;
+            document.getElementById('outFlour').textContent = "Weizenmehl Type W700 oder W480 (glatt)";
+            
+            // Berechnungs-Logik: Base-Time passt sich der Temperatur an, Quadrat-Kurve für das Verhältnis
+            let t_base = 16 - 0.4 * T; 
+            ratioFlour = Math.pow(t / t_base, 2);
+            
+        } else if (type === 'rvk') {
+            // Roggenvollkorn: 100% Hydration (Wasser = Mehl)
+            currentCalc.waterFactor = 1.0;
+            document.getElementById('outFlour').textContent = "Roggenvollkornmehl (oder R960)";
+            
+            // Angepasste Logik für Roggen
+            let t_base = 12.7 - 0.29 * T;
+            ratioFlour = Math.pow(t / t_base, 2);
+        }
+
+        // Mindest-Mehlverhältnis festlegen (man kann Hefe nicht mit "fast nichts" füttern)
+        if (ratioFlour < 0.5) ratioFlour = 0.5;
+
+        currentCalc.ratioFlour = ratioFlour;
+
+        // Ausgabe auf 1 Kommastelle runden für eine übersichtliche Ansicht
+        let dispFlour = ratioFlour.toFixed(1).replace('.0', '');
+        let dispWater = (ratioFlour * currentCalc.waterFactor).toFixed(1).replace('.0', '');
+
+        document.getElementById('outRatio').textContent = `1 : ${dispFlour} : ${dispWater}`;
+        
+        // Wassertemperatur-Logik
+        let waterHint = "";
+        if (T < 22) {
+            waterHint = "Nimm warmes Wasser (ca. 30-35°C), um dem Teig in der kühlen Umgebung eine Starthilfe zu geben.";
+        } else if (T > 26) {
+            waterHint = "Nimm kühleres Raumtemperatur-Wasser (ca. 20-22°C), damit die Hefe nicht zu schnell überhitzt.";
+        } else {
+            waterHint = "Handwarmes Wasser (ca. 25-28°C) ist perfekt.";
+        }
+        document.getElementById('outWaterTemp').textContent = waterHint;
+
+        parameterResult.style.display = 'block';
+        calculatorSection.style.display = 'block';
+        
+        // Falls Zielmenge schon eingegeben ist, direkt updaten
+        if(targetAmountInput.value) calculateAmounts();
+    }
+
+    function calculateAmounts() {
+        const target = parseFloat(targetAmountInput.value);
+        
+        if (isNaN(target) || target <= 0) {
+            amountsResult.style.display = 'none';
+            return;
+        }
+
+        const partsAsg = 1;
+        const partsFlour = currentCalc.ratioFlour;
+        const partsWater = currentCalc.ratioFlour * currentCalc.waterFactor;
+        
+        const totalParts = partsAsg + partsFlour + partsWater;
+        const multiplier = target / totalParts;
+
+        // Kaufmännisch runden auf Gramm
+        const asg = Math.round(partsAsg * multiplier);
+        const flour = Math.round(partsFlour * multiplier);
+        
+        // Wasser als Differenz zur Zielmenge berechnen, damit exakt die Wunschmenge herauskommt!
+        const water = target - asg - flour;
+
+        document.getElementById('calcAsg').textContent = `${asg}g`;
+        document.getElementById('calcFlour').textContent = `${flour}g`;
+        document.getElementById('calcWater').textContent = `${water}g`;
+        document.getElementById('calcTotal').textContent = target;
+
+        amountsResult.style.display = 'grid';
+    }
+</script>
+
+</body>
+</html>
+st targetAmountInput = document.getElementById('targetAmount');
     const amountsResult = document.getElementById('amountsResult');
 
     // Aktueller State
